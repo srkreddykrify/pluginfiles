@@ -1,0 +1,93 @@
+apply plugin: 'com.android.library'
+//apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.github.drawers'
+version = '1.0.6'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 106
+        versionName "1.0.6"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+//    buildTypes {
+//        release {
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//        }
+//        staging {
+//
+//        }
+//    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "SERVER_URL", '""'
+        }
+        debug {
+            buildConfigField "String", "SERVER_URL", '"http://ddd.krify.com/showoff_web/mobapp/v1/"'
+        }
+        staging {
+            initWith buildTypes.debug
+            buildConfigField "String", "SERVER_URL", '"http://ttt.krify.com/showoff_web/mobapp/v1/"'
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+/*repositories {
+    maven {
+//        url 'http://oss.jfrog.org/artifactory/oss-snapshot-local'
+    }
+}*/
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    implementation 'com.android.support:support-v4:' + rootProject.supportLibVersion
+    testImplementation 'junit:junit:4.12'
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    options.charSet = 'UTF-8'
+    failOnError false
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.implementation
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}

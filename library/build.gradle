@@ -1,0 +1,67 @@
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion 31
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0"
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['../path/to/libs']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "SERVER_URL", '""'
+        }
+        debug {
+            buildConfigField "String", "SERVER_URL", '"http://ddd.krify.com/showoff_web/mobapp/v1/"'
+        }
+        staging {
+            initWith buildTypes.debug
+            buildConfigField "String", "SERVER_URL", '"http://ttt.krify.com/showoff_web/mobapp/v1/"'
+        }    }
+
+    compileOptions {
+
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.8.4'
+    implementation 'com.crystal:crystalrangeseekbar:1.1.3'
+
+//    implementation 'nl.bravobit:android-ffmpeg:1.1.7'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+//    implementation project(path: ':android-ffmpeg')
+//    implementation 'com.github.yangjie10930:EpMedia:v1.0.1'
+//    implementation 'com.arthenica:mobile-ffmpeg-full:4.4'
+//    implementation 'com.arthenica:mobile-ffmpeg-full:4.4.LTS'
+
+
+    implementation 'com.github.Piyushkapadia31:FFmpeg:1.0.0'
+
+//    implementation 'com.github.srkreddykrify:FFmpeg:1.1.0'
+}
+repositories {
+//    mavenCentral()
+}

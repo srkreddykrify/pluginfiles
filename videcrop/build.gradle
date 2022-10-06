@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
+    }
+
+   /* buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }*/
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "SERVER_URL", '""'
+        }
+        debug {
+            buildConfigField "String", "SERVER_URL", '"http://ddd.krify.com/showoff_web/mobapp/v1/"'
+        }
+        staging {
+            initWith buildTypes.debug
+            buildConfigField "String", "SERVER_URL", '"http://ttt.krify.com/showoff_web/mobapp/v1/"'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    api "com.google.android.exoplayer:exoplayer-ui:2.9.0"
+    api "com.google.android.exoplayer:exoplayer-core:2.9.0"
+
+//    implementation('com.google.android.exoplayer:exoplayer-ui:2.10.0') {
+//        force = true
+//    }
+//    implementation('com.google.android.exoplayer:exoplayer-core:2.10.0') {
+//        force = true
+//    }
+   /* implementation('com.google.android.exoplayer:exoplayer-ui:2.
+   10.0') {
+        force = true
+    }
+//    api "com.google.android.exoplayer:exoplayer-core:2.9.0"
+    implementation('com.google.android.exoplayer:exoplayer-core:2.10.0') {
+        force = true
+    }*/
+
+    implementation 'com.github.Piyushkapadia31:FFmpeg:1.0.0'
+
+
+//    implementation 'com.github.srkreddykrify:FFmpeg:1.1.0'
+//    implementation 'nl.bravobit:android-ffmpeg:1.1.7'
+}

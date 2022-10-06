@@ -1,0 +1,50 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 32
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        minSdkVersion 14
+        targetSdkVersion 32
+        versionCode 1
+        versionName "0.2"
+    }
+    buildTypes {
+/*
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+*/
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "SERVER_URL", '""'
+        }
+        debug {
+            buildConfigField "String", "SERVER_URL", '"http://ddd.krify.com/showoff_web/mobapp/v1/"'
+        }
+        staging {
+            initWith buildTypes.debug
+            buildConfigField "String", "SERVER_URL", '"http://ttt.krify.com/showoff_web/mobapp/v1/"'
+        }
+    }
+}
+
+dependencies {
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+
+    implementation 'com.jarvanmo:exoplayerview:2.1.0'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.11.7'
+
+
+}

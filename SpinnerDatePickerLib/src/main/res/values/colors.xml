@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#5c1112</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="red">#a80000</color>
+    <color name="bright_red">#e70404</color>
+    <color name="circle_red">#A90101</color>
+    <color name="profile_bg_grey">#E8E9EB</color>
+    <color name="search_bg_dark_red">#760000</color>
+</resources>

@@ -1,0 +1,36 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url 'https://mvn.jwplayer.com/content/repositories/releases/' }
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url 'https://mvn.jwplayer.com/content/repositories/releases/' }
+    }
+}
+rootProject.name = "Pluginfiles"
+include ':app'
+include ':aspectratiorecyclerviewlib'
+include ':croppylib'
+include ':library'
+include ':list-visibility-utils'
+include ':mp4compose'
+include ':photoeditor'
+include ':SpinnerDatePickerLib'
+include ':videcrop'
+include ':video-player-manager'
+
+
+
+
+
