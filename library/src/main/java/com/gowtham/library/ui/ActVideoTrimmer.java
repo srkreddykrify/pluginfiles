@@ -485,6 +485,11 @@ public class ActVideoTrimmer extends AppCompatActivity {
 
 
 
+                complexCommand = new String[]{"-ss", TrimmerUtils.formatCSeconds(lastMinValue),
+                        "-i", String.valueOf(uri),
+                        "-t",
+                        TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue),
+                        "-c:v", "libx264", "-crf", "28", "-c", "copy", outputPath};
 
                 Log.e(TAG, "validateVideo lastMinValue : " + lastMinValue);
                 Log.e(TAG, "validateVideo lastMaxValue : " + lastMaxValue);
@@ -493,7 +498,7 @@ public class ActVideoTrimmer extends AppCompatActivity {
 
 
 
-                complexCommand = new String[]{"-ss", "" + TrimmerUtils.formatCSeconds(lastMinValue), "-y", "-i", String.valueOf(uri), "-t", "" + TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue), "-s", "320x240", "-r", "15", "-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", outputPath};
+//                complexCommand = new String[]{"-ss", "" + TrimmerUtils.formatCSeconds(lastMinValue), "-y", "-i", String.valueOf(uri), "-t", "" + TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue), "-s", "320x240", "-r", "15", "-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", outputPath};
 
             }
             //  execFFmpegBinary(complexCommand, true);
