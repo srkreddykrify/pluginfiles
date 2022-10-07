@@ -10,16 +10,20 @@ import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
+
 import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
+
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -32,26 +36,31 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.video.VideoListener;
+import com.google.android.exoplayer2.video.VideoSize;
+
+
 import static com.google.android.exoplayer2.C.TIME_UNSET;
 
-public class VideoPlayer implements Player.EventListener, TimeBar.OnScrubListener, VideoListener {
-    private SimpleExoPlayer player;
+public class VideoPlayer implements Player.Listener, TimeBar.OnScrubListener {
+    private ExoPlayer player;
+
+
     private OnProgressUpdateListener mUpdateListener;
     private Handler progressHandler;
     private Runnable progressUpdater;
 
 
     public VideoPlayer(Context context) {
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+
+
+
+        player = new ExoPlayer.Builder(context).build();
+
+
+
         LoadControl loadControl = new DefaultLoadControl();
-//        player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(context), trackSelector, loadControl);
-        player = ExoPlayerFactory.newSimpleInstance(context,new DefaultRenderersFactory(context), trackSelector, loadControl);
-//        player.setRepeatMode(Player.REPEAT_MODE_ONE);
+        player.setRepeatMode(Player.REPEAT_MODE_ONE);
         player.setRepeatMode(Player.REPEAT_MODE_ALL);
         player.addListener(this);
         progressHandler = new Handler();
@@ -63,18 +72,16 @@ public class VideoPlayer implements Player.EventListener, TimeBar.OnScrubListene
     }
 
     public void initMediaSource(Context context, String uri) {
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, Util.getUserAgent(context, "ExoPlayer"));
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        MediaSource videoSource = new ExtractorMediaSource(Uri.parse(uri),
-                dataSourceFactory, extractorsFactory, null, null);
 
-        player.prepare(videoSource);
-        player.addVideoListener(this);
+        player.setMediaItem(MediaItem.fromUri(uri));
+        player.prepare();
+        player.addListener(this);
+
     }
-
-    public SimpleExoPlayer getPlayer() {
+    public ExoPlayer getPlayer() {
         return player;
     }
+
 
     public void play(boolean play) {
         try {
@@ -102,28 +109,35 @@ public class VideoPlayer implements Player.EventListener, TimeBar.OnScrubListene
     }
 
     @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+    public void onTimelineChanged(Timeline timeline,  int reason) {
         updateProgress();
     }
 
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
 
+
+    @Override
+    public void onTracksChanged(Tracks tracks) {
+        Player.Listener.super.onTracksChanged(tracks);
+    }
+
+
+
+    @Override
+    public void onIsLoadingChanged(boolean isLoading) {
+        Player.Listener.super.onIsLoadingChanged(isLoading);
     }
 
     @Override
-    public void onLoadingChanged(boolean isLoading) {
-
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+    public void onPlaybackStateChanged(int playbackState) {
+        Player.Listener.super.onPlaybackStateChanged(playbackState);
         try {
             updateProgress();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
+
+
 
     @Override
     public void onRepeatModeChanged(int repeatMode) {
@@ -135,13 +149,10 @@ public class VideoPlayer implements Player.EventListener, TimeBar.OnScrubListene
 
     }
 
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
 
     @Override
-    public void onPositionDiscontinuity(int reason) {
+    public void onPositionDiscontinuity(Player.PositionInfo oldPosition, Player.PositionInfo newPosition, int reason) {
+        Player.Listener.super.onPositionDiscontinuity(oldPosition, newPosition, reason);
         updateProgress();
     }
 
@@ -150,10 +161,8 @@ public class VideoPlayer implements Player.EventListener, TimeBar.OnScrubListene
 
     }
 
-    @Override
-    public void onSeekProcessed() {
 
-    }
+
 
     @Override
     public void onScrubStart(TimeBar timeBar, long position) {
@@ -225,8 +234,21 @@ public class VideoPlayer implements Player.EventListener, TimeBar.OnScrubListene
         mUpdateListener = updateListener;
     }
 
-    @Override
+   /* @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+        try {
+            if(mUpdateListener != null){
+                mUpdateListener.onFirstTimeUpdate(player.getDuration(), player.getCurrentPosition());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    @Override
+    public void onVideoSizeChanged(VideoSize videoSize) {
+        Player.Listener.super.onVideoSizeChanged(videoSize);
+
         try {
             if(mUpdateListener != null){
                 mUpdateListener.onFirstTimeUpdate(player.getDuration(), player.getCurrentPosition());

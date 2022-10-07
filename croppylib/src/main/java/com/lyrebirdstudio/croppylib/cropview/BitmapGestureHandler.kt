@@ -25,8 +25,8 @@ class BitmapGestureHandler(
 
     private val scrollListener = object : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
+            e1: MotionEvent,
+            e2: MotionEvent,
             distanceX: Float,
             distanceY: Float
         ): Boolean {
@@ -37,7 +37,7 @@ class BitmapGestureHandler(
     }
 
     private val doubleTapListener = object : GestureDetector.SimpleOnGestureListener() {
-        override fun onDoubleTap(event: MotionEvent?): Boolean {
+        override fun onDoubleTap(event: MotionEvent): Boolean {
             event?.let { bitmapGestureListener.onDoubleTap(it) }
             return true
         }
@@ -45,7 +45,7 @@ class BitmapGestureHandler(
 
     private val scaleListener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
-        override fun onScaleEnd(detector: ScaleGestureDetector?) {
+        override fun onScaleEnd(detector: ScaleGestureDetector) {
             super.onScaleEnd(detector)
             bitmapGestureListener.onEnd()
         }

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -103,7 +104,7 @@ public class CropVideoView extends FrameLayout {
         mCropView.resetCropOverlayView();
     }
 
-    public void setPlayer(SimpleExoPlayer player) {
+    public void setPlayer(ExoPlayer player) {
         mPlayerView.setPlayer(player);
         mCropView.resetCropOverlayView();
     }

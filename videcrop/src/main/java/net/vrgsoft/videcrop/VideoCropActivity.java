@@ -282,6 +282,7 @@ public class VideoCropActivity extends AppCompatActivity implements VideoPlayer.
 
         mVideoPlayer = new VideoPlayer(this);
         mCropVideoView.setPlayer(mVideoPlayer.getPlayer());
+
         mVideoPlayer.initMediaSource(this, uri);
         mVideoPlayer.setUpdateListener(this);
 

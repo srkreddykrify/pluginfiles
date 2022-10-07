@@ -6,4 +6,6 @@
         <attr name="socialActiveColor" format="color" />
         <attr name="socialPassiveColor" format="color" />
     </declare-styleable>
+
+    <attr format="color" name="colorAccent"/>
 </resources>

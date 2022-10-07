@@ -40,51 +40,34 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-//import com.arthenica.mobileffmpeg.FFmpeg;
 
-
-/*import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.ExecuteCallback;
-import com.arthenica.mobileffmpeg.FFmpeg;*/
 
 
 import com.bumptech.glide.Glide;
-import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
-import com.crystal.crystalrangeseekbar.widgets.CrystalSeekbar;
-import com.google.android.exoplayer2.ExoPlayerFactory;
+
+import com.google.android.exoplayer2.ExoPlayer;
+
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.gowtham.library.R;
 import com.gowtham.library.utils.CompressOption;
 import com.gowtham.library.utils.CustomProgressView;
-import com.gowtham.library.utils.FileUtils;
 import com.gowtham.library.utils.LogMessage;
 import com.gowtham.library.utils.TrimVideo;
 import com.gowtham.library.utils.TrimVideoOptions;
 import com.gowtham.library.utils.TrimmerUtils;
+import com.gowtham.library.widgets.CrystalRangeSeekbar;
+import com.gowtham.library.widgets.CrystalSeekbar;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-//import nl.bravobit.ffmpeg.FFtask;
-
-
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler;
 import nl.bravobit.ffmpeg.FFmpeg;
-import nl.bravobit.ffmpeg.FFtask;
+
 
 
 public class ActVideoTrimmer extends AppCompatActivity {
@@ -93,11 +76,11 @@ public class ActVideoTrimmer extends AppCompatActivity {
     public static final int RETURN_CODE_SUCCESS = 0;
 
     public static final int RETURN_CODE_CANCEL = 255;
-    private PlayerView playerView;
+    private StyledPlayerView playerView;
 
     private static final int PER_REQ_CODE = 115;
 
-    private SimpleExoPlayer videoPlayer;
+    private ExoPlayer videoPlayer;
 
     private ImageView imagePlayPause;
 
@@ -195,13 +178,14 @@ public class ActVideoTrimmer extends AppCompatActivity {
 
     private void initPlayer() {
         try {
-            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            TrackSelector trackSelector =
-                    new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
-            videoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+
+            videoPlayer = new ExoPlayer.Builder(this).build();
+
             playerView.requestFocus();
             playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
             playerView.setPlayer(videoPlayer);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -281,16 +265,16 @@ public class ActVideoTrimmer extends AppCompatActivity {
 
     private void buildMediaSource(Uri mUri) {
         try {
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
-                    Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
-            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(mUri);
-            videoPlayer.prepare(videoSource);
+            videoPlayer = new ExoPlayer.Builder(this).build();
+            videoPlayer.setMediaItem(MediaItem.fromUri(mUri));
+            videoPlayer.prepare();
+
             videoPlayer.setPlayWhenReady(true);
-            videoPlayer.addListener(new Player.DefaultEventListener() {
+
+            videoPlayer.addListener(new Player.Listener() {
                 @Override
-                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                public void onPlaybackStateChanged(int playbackState) {
+                    Player.Listener.super.onPlaybackStateChanged(playbackState);
                     switch (playbackState) {
                         case Player.STATE_ENDED:
                             LogMessage.v("onPlayerStateChanged: Video ended.");
@@ -309,6 +293,7 @@ public class ActVideoTrimmer extends AppCompatActivity {
                     }
                 }
             });
+
             setImageBitmaps();
         } catch (Exception e) {
             e.printStackTrace();
@@ -480,26 +465,6 @@ public class ActVideoTrimmer extends AppCompatActivity {
 
         loadFFMpegBinary(this);
         if (isValidVideo) {
-//            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "";
-
-
-          /*  path =  createBaseDirectory().getAbsolutePath();
-
-
-
-            if (destinationPath != null)
-                path = destinationPath;
-            int fileNo = 0;
-            String fileName = "trimmed_video_";
-            File newFile = new File(path + File.separator +
-                    (fileName + fileNo) + "." + TrimmerUtils.getFileExtension(this, uri));
-            while (newFile.exists()) {
-                fileNo++;
-                newFile = new File(path + File.separator +
-                        (fileName + fileNo) + "." + TrimmerUtils.getFileExtension(this, uri));
-            }
-            outputPath = String.valueOf(newFile);*/
-
 
             outputPath = createBaseDirectory();
 
@@ -518,22 +483,7 @@ public class ActVideoTrimmer extends AppCompatActivity {
                 complexCommand = getAccurateBinary();
             else {
 
-                //original trimmer guide
 
-             /*   complexCommand = new String[]{"-ss", TrimmerUtils.formatCSeconds(lastMinValue),
-                        "-i", String.valueOf(uri),
-                        "-t",
-                        TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue),
-                        "-async", "1", "-strict", "-2","-c","copy" , outputPath};
-             */
-
-             /*   complexCommand = new String[]{"-ss", TrimmerUtils.formatCSeconds(lastMinValue),
-                        "-i", String.valueOf(uri),
-                        "-t",
-                        TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue),
-                        "-async", "1", "-strict", "-2", outputPath};
-
-*/
 
 
                 Log.e(TAG, "validateVideo lastMinValue : " + lastMinValue);
@@ -542,26 +492,6 @@ public class ActVideoTrimmer extends AppCompatActivity {
                 Log.e(TAG, "validateVideo  trim lastMaxValue - lastMinValue : " + TrimmerUtils.formatCSeconds(lastMaxValue));
 
 
-//                ffmpeg -ss 00:03:00 -i input_file.mkv -t 00:01:19 -c:v ffvhuff -pix_fmt yuv420p -y output_file.mkv
-/*
-                complexCommand = new String[]{"-ss", TrimmerUtils.formatCSeconds(lastMinValue),
-                        "-i", String.valueOf(uri),
-                        "-t",
-                        TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue),
-                        "-c:v","ffvhuff",  "-pix_fmt yuv420p", "-y", outputPath};*/
-
-
-                //currently using command
-
-                /*complexCommand = new String[]{"-ss", TrimmerUtils.formatCSeconds(lastMinValue),
-                        "-i", String.valueOf(uri),
-                        "-t",
-                        TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue),
-                        "-c:v", "libx264", "-crf", "28", "-c", "copy", outputPath};
-                Log.e(TAG, "validateVideo: " + complexCommand.toString());*/
-
-//                         "-c:v","libx264",  "-crf", "28",   "-c:v","copy", outputPath};
-//                         "-c:v","libx264", "-c:a", "aac", "-crf", "28",   "-c","copy", "-strict", "experimental", outputPa
 
                 complexCommand = new String[]{"-ss", "" + TrimmerUtils.formatCSeconds(lastMinValue), "-y", "-i", String.valueOf(uri), "-t", "" + TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue), "-s", "320x240", "-r", "15", "-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", outputPath};
 
@@ -611,79 +541,6 @@ public class ActVideoTrimmer extends AppCompatActivity {
     }
 
     private Handler handler = new Handler();
-  /*private void execFFmpegBinary(final String[] command, boolean retry) {
-        Log.d(TAG, "execFFmpegBinary() called with: command = [" + command + "], retry = [" + retry + "]");
-        try {
-
-
-            nl.bravobit.ffmpeg.FFmpeg fFmpeg1 = nl.bravobit.ffmpeg.FFmpeg.getInstance(this);
-
-            nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler executeBinaryResponseHandler = new nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler(){
-
-                @Override
-                public void onSuccess(String message) {
-                    super.onSuccess(message);
-                    Log.e(TAG, "onSuccess: "+message);
-//                    dismissProgressDialog1();
-                    dismissProgressDialog();
-//                    dialog.dismiss();
-                    Intent intent = new Intent();
-                    intent.putExtra(TrimVideo.TRIMMED_VIDEO_PATH, outputPath);
-                    intent.putExtra(TrimVideo.CROP_RATIO ,ratio);
-                    intent.putExtra(TrimVideo.IS_CROPPED ,iscropped);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                }
-
-                @Override
-                public void onProgress(String message) {
-                    super.onProgress(message);
-                    Log.e(TAG, "onProgress: "+message);
-                }
-
-                @Override
-                public void onFailure(String message) {
-                    super.onFailure(message);
-                    Log.e(TAG, "onFailure: "+message);
-//                    dismissProgressDialog1();
-                    dismissProgressDialog();
-                }
-
-                @Override
-                public void onStart() {
-                    super.onStart();
-
-                    Log.e(TAG, "onStart: "+ "on start");
-                }
-
-                @Override
-                public void onFinish() {
-                    super.onFinish();
-
-                    Log.e(TAG, "onFinish: "+"on finish");
-//                    dismissProgressDialog1();
-                    dismissProgressDialog();
-                }
-            };
-
-
-
-            final FFtask task = fFmpeg1.execute(command, executeBinaryResponseHandler);
-
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Log.e(TAG, "run: "+ "STOPPING THE RENDERING!");
-                    task.sendQuitSignal();
-                }
-            }, 8000);
-
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-
-
-    }*/
 
     private void execFFmpegBinary(String[] command) {
         ffmpeg = FFmpeg.getInstance(this);

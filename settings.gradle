@@ -22,8 +22,9 @@ rootProject.name = "Pluginfiles"
 include ':app'
 include ':aspectratiorecyclerviewlib'
 include ':croppylib'
+/*
+include ':list-visibility-utils'*/
 include ':library'
-include ':list-visibility-utils'
 include ':mp4compose'
 include ':photoeditor'
 include ':SpinnerDatePickerLib'

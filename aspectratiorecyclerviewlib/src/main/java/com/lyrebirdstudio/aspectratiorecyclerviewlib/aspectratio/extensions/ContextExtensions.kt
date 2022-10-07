@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.TypedValue
 import com.lyrebirdstudio.aspectratiorecyclerviewlib.R
 
+
 fun Context.fetchAccentColor(): Int {
     val typedValue = TypedValue()
     val a = obtainStyledAttributes(typedValue.data, intArrayOf(R.attr.colorAccent))
